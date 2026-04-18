@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PressCoach - Register</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --cyber-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+        }
+
+        body { 
+            background: var(--dark-bg); 
+            color: white; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+        }
+
+        .container { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 12px; 
+            border: 1px solid var(--cyber-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); 
+            width: 95%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+
+        h1 { color: var(--cyber-green); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
+
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 12px; 
+            border-radius: 4px; 
+            border: 1px solid #333; 
+            background: #000; 
+            color: var(--cyber-green); 
+            box-sizing: border-box; 
+            outline: none;
+        }
+
+        input:focus { border-color: var(--cyber-green); }
+
+        button { 
+            background: var(--cyber-green); 
+            color: black; 
+            border: none; 
+            padding: 15px; 
+            width: 100%; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .link-back { margin-top: 20px; display: block; color: var(--cyber-green); text-decoration: none; font-size: 0.75em; opacity: 0.7; }
+        .status { margin-top: 15px; font-size: 0.85em; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyABbIAYEk8cZQGeU__QDEHNCD1wBFhXy7o",
+            authDomain: "presscoach-392f1.firebaseapp.com",
+            projectId: "presscoach-392f1",
+            storageBucket: "presscoach-392f1.firebasestorage.app",
+            messagingSenderId: "265120211081",
+            appId: "1:265120211081:web:0b8864713b88511d89e658",
+            measurementId: "G-NQ6TX59M4H"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>New_Athlete_Scan</h1>
+        <form id="regForm">
+            <input type="text" id="firstName" placeholder="FIRST_NAME" required>
+            <input type="text" id="lastName" placeholder="LAST_NAME" required>
+            <input type="number" id="height" placeholder="HEIGHT_CM" required>
+            <input type="number" id="weight" placeholder="WEIGHT_KG" required>
+            <input type="email" id="email" placeholder="EMAIL_ID" required>
+            <input type="password" id="password" placeholder="ACCESS_CODE" required>
+            <input type="password" id="confirmPassword" placeholder="CONFIRM_ACCESS_CODE" required>
+            <div style="display: flex; align-items: center; margin-bottom: 15px; font-size: 0.75em; color: #888;">
+                <input type="checkbox" id="showRegPass" style="width: auto; margin: 0 8px 0 0; cursor: pointer;" onclick="toggleRegPass()">
+                <label for="showRegPass" style="cursor: pointer;">SHOW_CODES</label>
+            </div>
+            <button type="button" onclick="registerUser()">Upload Profile</button>
+        </form>
+        <a href="index.html" class="link-back"><- RETURN_TO_LOGIN</a>
+        <div id="regStatus" class="status"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

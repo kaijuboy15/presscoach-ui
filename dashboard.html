@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PressCoach - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="firebase_config.js"></script>
+    <script src="script.js"></script>
+
+    <style>
+        :root {
+            --cyber-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --danger: #ff4444;
+            --muted: #888;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container { max-width: 420px; margin: auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-left: 40px;
+        }
+
+        #welcomeText {
+            font-size: 0.8em;
+            color: var(--cyber-green);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .card h3 {
+            color: var(--cyber-green);
+            text-transform: uppercase;
+            font-size: 1em;
+            margin-top: 0;
+            letter-spacing: 1px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 4px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-start {
+            background: var(--cyber-green);
+            color: black;
+            font-size: 1.1em;
+            box-shadow: 0 0 10px rgba(57,255,20,0.3);
+        }
+
+        .btn-start:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--danger);
+            width: auto;
+            padding: 5px 10px;
+            border: 1px solid var(--danger);
+            font-size: 0.7em;
+        }
+
+        .status {
+            margin-top: 15px;
+            color: var(--muted);
+            font-size: 0.8em;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+        }
+
+        #hamburger {
+            position: fixed;
+            top: 25px;
+            left: 20px;
+            z-index: 1001;
+            cursor: pointer;
+        }
+
+        #hamburger div {
+            width: 25px;
+            height: 2px;
+            background-color: var(--cyber-green);
+            margin: 6px 0;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 260px;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: -260px;
+            background-color: #0f0f0f;
+            border-right: 1px solid var(--cyber-green);
+            transition: 0.4s;
+            padding-top: 80px;
+            text-align: left;
+        }
+
+        .sidebar.active { left: 0; }
+        .sidebar-content { padding: 0 25px; }
+
+        .sidebar a {
+            padding: 15px 0;
+            text-decoration: none;
+            font-size: 0.85rem;
+            color: #888;
+            display: block;
+        }
+
+        .sidebar a:hover { color: var(--cyber-green); }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 88%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--cyber-green);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: left;
+            max-height: 84vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1999;
+        }
+
+        .close-btn {
+            color: var(--cyber-green);
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-title {
+            color: var(--cyber-green);
+            margin-top: 0;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* User Details rows */
+        .ud-row { font-size: 0.85em; line-height: 2; color: #ccc; }
+        .ud-label { color: var(--cyber-green); }
+        .ud-divider { border: none; border-top: 0.5px solid #333; margin: 12px 0; }
+
+        /* Variation boxes */
+        .summary-block {
+            font-size: 0.82em;
+            color: #ddd;
+            line-height: 1.8;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .variation-box {
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #101010;
+        }
+
+        .variation-title {
+            color: var(--cyber-green);
+            font-weight: bold;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .variation-row { font-size: 0.8em; color: #ddd; line-height: 1.7; }
+        .variation-pass { color: #39ff14; }
+        .variation-fail { color: #ff4444; }
+
+        .set-line { font-size: 0.78em; color: #aaa; line-height: 1.6; }
+
+        .feedback-line {
+            font-size: 0.76em;
+            color: #888;
+            line-height: 1.6;
+            margin-top: 4px;
+        }
+
+        .vp-divider { border: none; border-top: 1px solid #1e1e1e; margin: 8px 0; }
+        .muted-text { font-size: 0.8em; color: var(--muted); }
+    </style>
+</head>
+<body>
+
+<div id="hamburger" onclick="toggleSidebar()">
+    <div></div><div></div><div></div>
+</div>
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-content">
+        <h2 style="color:var(--cyber-green);font-size:1rem;">SYSTEM_MENU</h2>
+        <hr style="border:0.5px solid #222;">
+        <a href="#" onclick="showUserDetails()">> USER DETAILS</a>
+        <a href="#" onclick="showVariationProgress()">> VARIATION PROGRESS</a>
+        <a href="#" onclick="showOverview()">> OVERVIEW</a>
+    </div>
+</div>
+
+<!-- Overview Modal -->
+<div id="overviewModal" class="modal">
+    <span class="close-btn" onclick="closeAllModals()">[X]</span>
+    <h3 class="modal-title">"Where Vision meets Strength"</h3>
+    <p style="font-size:0.8em;line-height:1.6;color:#ccc;">
+        PressCoach is an AI-powered workout monitoring system that uses computer vision to track
+        and evaluate exercise performance in real time. By utilizing a webcam and pose estimation
+        technology, the system detects body movements, calculates joint angles, and counts
+        repetitions to ensure proper execution of pressing exercises.
+        <br><br>
+        The platform integrates a web-based interface that allows users to register, log in, and
+        remotely start workout sessions. A Python-based backend processes movement data while
+        Firebase securely stores user and session information for progress tracking. PressCoach
+        is designed to function both online and offline, ensuring uninterrupted performance
+        during workouts.
+        <br><br>
+        With its modular architecture and real-time feedback capabilities, PressCoach provides
+        an accessible, intelligent, and cost-efficient solution for enhancing exercise accuracy
+        and user performance monitoring.
+    </p>
+</div>
+
+<!-- User Details Modal -->
+<div id="userDetailsModal" class="modal">
+    <span class="close-btn" onclick="closeAllModals()">[X]</span>
+    <h3 class="modal-title">User Details</h3>
+    <div class="ud-row">
+        <div><span class="ud-label">FIRST:</span> <span id="udFirst">--</span></div>
+        <div><span class="ud-label">LAST:</span> <span id="udLast">--</span></div>
+        <div><span class="ud-label">EMAIL:</span> <span id="udEmail">--</span></div>
+        <div><span class="ud-label">MEMBER SINCE:</span> <span id="udCreated">--</span></div>
+        <div><span class="ud-label">HEIGHT:</span> <span id="udHeight">--</span></div>
+        <div><span class="ud-label">WEIGHT:</span> <span id="udWeight">--</span></div>
+    </div>
+    <hr class="ud-divider">
+    <div class="ud-row">
+        <div><span class="ud-label">LAST SESSION:</span> <span id="udLastDate">--</span></div>
+        <div><span class="ud-label">STATUS:</span> <span id="udLastStatus">--</span></div>
+    </div>
+</div>
+
+<!-- Variation Progress Modal -->
+<div id="variationModal" class="modal">
+    <span class="close-btn" onclick="closeAllModals()">[X]</span>
+    <h3 class="modal-title">Variation Progress</h3>
+    <div id="vpContent" class="muted-text">Loading...</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="container">
+    <header>
+        <h3 id="welcomeText">ATHLETE_ID: --</h3>
+        <button onclick="logout()" class="logout-btn">LOG OUT</button>
+    </header>
+
+    <div class="card">
+        <h3>System Control</h3>
+        <button id="startBtn" onclick="triggerWorkout()" class="btn-start">🚀 Start Workout</button>
+        <div id="bridgeStatus" class="status">BRIDGE_STATUS: STANDBY</div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:5000";
+
+    // ── Sidebar / modal helpers ──────────────────────────────────────
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    function closeAllModals() {
+        ["overviewModal","userDetailsModal","variationModal"].forEach(id => {
+            document.getElementById(id).style.display = "none";
+        });
+        document.getElementById("modalOverlay").style.display = "none";
+        document.getElementById("sidebar").classList.remove("active");
+    }
+
+    function openModal(id) {
+        closeAllModals();
+        document.getElementById(id).style.display = "block";
+        document.getElementById("modalOverlay").style.display = "block";
+    }
+
+    function showOverview()          { openModal("overviewModal"); }
+    function showUserDetails()       { openModal("userDetailsModal");  populateUserDetailsModal(); }
+    function showVariationProgress() { openModal("variationModal");    loadVariationProgressModal(); }
+
+    function logout() {
+        localStorage.removeItem("presscoach_user");
+        localStorage.removeItem("presscoach_name");
+        window.location.href = "index.html";
+    }
+
+    // ── Workout trigger ──────────────────────────────────────────────
+    async function triggerWorkout() {
+        const email    = localStorage.getItem("presscoach_user");
+        const statusEl = document.getElementById("bridgeStatus");
+        const startBtn = document.getElementById("startBtn");
+        if (!email) { statusEl.innerText = "BRIDGE_STATUS: NO USER"; return; }
+
+        try {
+            startBtn.disabled  = true;
+            statusEl.innerText = "BRIDGE_STATUS: STARTING DUAL CAMERA SESSION...";
+
+            const res  = await fetch(`${API_BASE}/start_workout`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+
+            statusEl.innerText = data.status === "success"
+                ? "BRIDGE_STATUS: SESSION ACTIVE"
+                : `BRIDGE_STATUS: ${data.message || "FAILED"}`;
+        } catch (err) {
+            statusEl.innerText = "BRIDGE_STATUS: CONNECTION FAILED";
+        } finally {
+            startBtn.disabled = false;
+        }
+    }
+
+    // ── Wait for Firebase auth ───────────────────────────────────────
+    function waitForUser() {
+        return new Promise(resolve => {
+            const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+        });
+    }
+
+    // ── Get last session directly from Firestore ─────────────────────
+    async function getLastSession(email) {
+        let snap;
+        try {
+            snap = await db.collection("users").doc(email)
+                .collection("sessions")
+                .orderBy("created_at", "desc")
+                .limit(1).get();
+        } catch (e) {
+            snap = await db.collection("users").doc(email)
+                .collection("sessions")
+                .orderBy("end_time", "desc")
+                .limit(1).get();
+        }
+        return snap.empty ? null : snap.docs[0].data();
+    }
+
+    // ── Build variation progress HTML from a session object ──────────
+    function buildVariationHTML(session) {
+        if (!session) return "<div class='muted-text'>No session data yet.</div>";
+
+        const raw = session.variations;
+        if (!raw)  return "<div class='muted-text'>No variation data in last session.</div>";
+
+        let list = [];
+        if (Array.isArray(raw)) {
+            list = raw;
+        } else if (typeof raw === "object") {
+            list = Object.entries(raw).map(([name, d]) => ({ name, ...d }));
+        }
+        if (list.length === 0) return "<div class='muted-text'>No variation data yet.</div>";
+
+        const ORDER = ["DECLINE","FLAT","INCLINE"];
+        list.sort((a, b) => ORDER.indexOf(a.name) - ORDER.indexOf(b.name));
+
+        const overall = session.passed
+            ? '<span class="variation-pass">PASSED ✅</span>'
+            : '<span class="variation-fail">FAILED ❌</span>';
+
+        // Weight progression ladder (must match Python)
+        const WEIGHT_LEVELS = [4, 10, 14];
+        const currentWeight = session.weight ?? "--";
+
+        // Build ladder UI
+        const ladder = WEIGHT_LEVELS.map(w => {
+            if (w === currentWeight) {
+                return `<span style="color:#39ff14;">[${w}]</span>`;
+            }
+            return `<span style="color:#555;">${w}</span>`;
+        }).join(" → ");
+
+        const summary = `
+            <div class="summary-block">
+                <div>OVERALL: ${overall}</div>
+                <div>
+                    WEIGHT: <span style="color:#39ff14;">${currentWeight}</span> lbs
+                    &nbsp;|&nbsp;
+                    TARGET REPS: ${session.target_reps ?? "--"}
+                    &nbsp;|&nbsp;
+                    MAX SETS: ${session.max_sets ?? "--"}
+                </div>
+                <div style="font-size:0.75em; color:#888;">
+                    PROGRESSION: ${ladder}
+                </div>
+                <div>END TIME: ${session.end_time ?? "--"}</div>
+            </div>`;
+            
+        const boxes = list.map(v => {
+            const w    = v.width_feedback  || {};
+            const h    = v.height_feedback || {};
+            const sets = v.set_summaries   || [];
+
+            const passLabel = v.passed
+                ? '<span class="variation-pass">PASSED</span>'
+                : '<span class="variation-fail">FAILED</span>';
+
+            const avgScore = typeof v.avg_score === "number" ? v.avg_score.toFixed(2) : "--";
+
+            const setsHtml = sets.length > 0
+                ? sets.map(s =>
+                    `<div class="set-line">Set ${s.set}: ${s.reps ?? "--"} reps — score ${typeof s.score === "number" ? s.score.toFixed(2) : "--"}</div>`
+                  ).join("")
+                : `<div class="set-line">No set breakdown.</div>`;
+
+            return `
+                <div class="variation-box">
+                    <div class="variation-title">${v.name || "UNKNOWN"}</div>
+                    <div class="variation-row">STATUS: ${passLabel} &nbsp;|&nbsp; AVG SCORE: ${avgScore}</div>
+                    <div class="variation-row">SETS: ${v.sets_completed ?? 0} &nbsp;|&nbsp; REPS: ${v.reps_completed ?? 0}</div>
+                    <hr class="vp-divider">
+                    ${setsHtml}
+                    <hr class="vp-divider">
+                    <div class="feedback-line">WIDTH &rarr; CLOSE: ${w.CLOSE||0}, NORMAL: ${w.NORMAL||0}, WIDE: ${w.WIDE||0}</div>
+                    <div class="feedback-line">HEIGHT &rarr; LOW: ${h.LOW||0}, NORMAL: ${h.NORMAL||0}, OVERHEAD: ${h.OVERHEAD||0}</div>
+                </div>`;
+        }).join("");
+
+        return summary + boxes;
+    }
+
+    // ── Variation Progress modal loader ──────────────────────────────
+    async function loadVariationProgressModal() {
+        const el = document.getElementById("vpContent");
+        el.innerHTML = "<div class='muted-text'>Loading...</div>";
+
+        const user = await waitForUser();
+        if (!user) { el.innerHTML = "<div class='muted-text'>Not logged in.</div>"; return; }
+
+        try {
+            const session  = await getLastSession(user.email);
+            el.innerHTML   = buildVariationHTML(session);
+        } catch (err) {
+            console.error("loadVariationProgressModal:", err);
+            el.innerHTML = "<div class='muted-text'>Failed to load data.</div>";
+        }
+    }
+
+    // ── User Details modal loader ────────────────────────────────────
+    async function populateUserDetailsModal() {
+        const set = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = (val === undefined || val === null || val === "") ? "--" : String(val);
+        };
+
+        ["udFirst","udLast","udEmail","udCreated","udHeight","udWeight","udLastDate","udLastStatus"]
+            .forEach(id => set(id, "..."));
+
+        const user = await waitForUser();
+        if (!user) { set("udLastStatus","Not logged in"); return; }
+
+        set("udEmail", user.email);
+
+        try {
+            // Read profile directly from Firestore
+            const doc     = await db.collection("users").doc(user.email).get();
+            const profile = doc.exists ? doc.data() : {};
+
+            // Registration saves as firstName/lastName (camelCase)
+            set("udFirst",   profile.firstName  || profile.first_name  || "--");
+            set("udLast",    profile.lastName   || profile.last_name   || "--");
+            set("udHeight",  profile.height  || "--");
+            set("udWeight",  profile.weight  || "--");
+
+            const created = profile.created_at && profile.created_at.toDate
+                ? profile.created_at.toDate().toLocaleDateString()
+                : "--";
+            set("udCreated", created);
+
+            // Last session
+            const session = await getLastSession(user.email);
+            if (!session) {
+                set("udLastDate",   "--");
+                set("udLastStatus", "No sessions yet");
+                return;
+            }
+
+            set("udLastDate", session.end_time || "--");
+            set("udLastStatus",
+                session.passed === true  ? "PASSED ✅" :
+                session.passed === false ? "FAILED ❌" : "--"
+            );
+
+        } catch (err) {
+            console.error("populateUserDetailsModal:", err);
+            set("udLastStatus", "Error loading data");
+        }
+    }
+
+    // ── Page init ────────────────────────────────────────────────────
+    window.onload = () => {
+        const email     = localStorage.getItem("presscoach_user");
+        const firstName = localStorage.getItem("presscoach_name");
+        if (!email) { window.location.href = "index.html"; return; }
+
+        document.getElementById("welcomeText").innerText =
+            `WELCOME, ${firstName ? firstName.toUpperCase() : "ATHLETE"}`;
+    };
+</script>
+</body>
+</html>

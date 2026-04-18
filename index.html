@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PressCoach - Login</title>
+    <style>
+        :root {
+            --cyber-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+        }
+
+        body { 
+            background: var(--dark-bg); 
+            color: white; 
+            font-family: 'Courier New', Courier, monospace; /* Tech vibe */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+
+        .login-card { 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: 12px; 
+            border: 1px solid var(--cyber-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); 
+            width: 90%; 
+            max-width: 350px; 
+            text-align: center; 
+        }
+
+        h1 { color: var(--cyber-green); text-transform: uppercase; letter-spacing: 2px; }
+        p { color: #888; font-size: 0.8em; margin-bottom: 25px; }
+
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border-radius: 4px; 
+            border: 1px solid #333; 
+            background: #000; 
+            color: var(--cyber-green); 
+            box-sizing: border-box; 
+            outline: none;
+        }
+
+        input:focus { border-color: var(--cyber-green); }
+
+        .btn-login { 
+            background: var(--cyber-green); 
+            color: black; 
+            border: none; 
+            padding: 15px; 
+            width: 100%; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase;
+        }
+
+        .link-reg { margin-top: 20px; display: block; color: var(--cyber-green); text-decoration: none; font-size: 0.75em; opacity: 0.7; }
+        #statusMessage { margin-top: 15px; font-size: 0.85em; color: #ff4444; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>PressCoach</h1>
+        
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPass" placeholder="Password" required>
+        <div style="display: flex; align-items: center; margin-bottom: 15px; font-size: 0.75em; color: #888;">
+            <input type="checkbox" id="showPass" style="width: auto; margin: 0 8px 0 0; cursor: pointer;" onclick="togglePass()">
+            <label for="showPass" style="cursor: pointer; text-transform: uppercase;">Show Access Code</label>
+        </div>
+        
+        <button class="btn-login" onclick="loginUser()">Login</button>
+        <a href="forgot_password.html" class="link-reg" style="margin-top: 10px;">Forgot Password? Click here!</a>
+        <a href="register.html" class="link-reg">NO ACCOUNT YET? REGISTER NOW!</a>
+        <div id="statusMessage"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="firebase_config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
