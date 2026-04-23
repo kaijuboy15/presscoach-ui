@@ -455,35 +455,23 @@
 
     // ── Workout trigger ──────────────────────────────────────────────
     async function triggerWorkout() {
-        const email    = localStorage.getItem("presscoach_user");
-        const statusEl = document.getElementById("bridgeStatus");
-        const startBtn = document.getElementById("startBtn");
-        if (!email) { statusEl.innerText = "BRIDGE_STATUS: NO USER"; return; }
+        const email = localStorage.getItem("presscoach_user");
+        const status = document.getElementById("bridgeStatus");
+        if (!email) { alert("Please login first!"); return; }
+        status.innerText = "Waking up laptop camera...";
         try {
-            startBtn.disabled = true;
-            statusEl.className = "bridge-status";
-            statusEl.innerText = "BRIDGE_STATUS: CONNECTING...";
-            const res  = await fetch(`${API_BASE}/start_workout`, {
+            const res = await fetch(`${API_URL}/start_workout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
             });
             const data = await res.json();
-            if (data.status === "success") {
-                statusEl.className = "bridge-status active";
-                statusEl.innerText = "BRIDGE_STATUS: SESSION ACTIVE";
-            } else {
-                statusEl.className = "bridge-status error";
-                statusEl.innerText = `BRIDGE_STATUS: ${data.message || "FAILED"}`;
-            }
-        } catch (err) {
-            statusEl.className = "bridge-status error";
-            statusEl.innerText = "BRIDGE_STATUS: CONNECTION FAILED";
-        } finally {
-            startBtn.disabled = false;
+            status.innerText = data.message;
+        } catch (e) {
+            status.innerText = "Laptop Offline. Is window_response.py running?";
         }
     }
-
+    
     // ── Firebase helpers ─────────────────────────────────────────────
     async function getLastSession(email) {
         let snap;
