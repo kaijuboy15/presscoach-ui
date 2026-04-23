@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PressCoach - Dashboard</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0a0a0a">
+    <meta name="theme-color" content="#ffffff">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -15,16 +15,16 @@
 
     <style>
         :root {
-            --green:    #39ff14;
-            --green-dim:#1a7a09;
-            --bg:       #080808;
-            --surface:  #111111;
-            --surface2: #181818;
-            --border:   #222222;
-            --text:     #cccccc;
-            --muted:    #555555;
-            --danger:   #ff4444;
-            --radius:   14px;
+            --green:     #1a8c00;
+            --green-dim: #2db800;
+            --bg:        #f4f4f4;
+            --surface:   #ffffff;
+            --surface2:  #f0f0f0;
+            --border:    #dddddd;
+            --text:      #111111;
+            --muted:     #666666;
+            --danger:    #cc0000;
+            --radius:    14px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,13 +63,14 @@
             cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; }
         .sidebar-overlay.active { display: block; }
 
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
-            background: var(--surface); border-right: 1px solid var(--green);
+            background: var(--surface); border-right: 2px solid var(--green);
             z-index: 201; transition: left 0.3s ease; padding-top: 60px;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.1);
         }
         .sidebar.active { left: 0; }
 
@@ -89,13 +90,14 @@
             letter-spacing: 1px; text-transform: uppercase;
             transition: color 0.2s, background 0.2s; border-left: 3px solid transparent;
         }
-        .sidebar a:hover { color: var(--green); background: rgba(57,255,20,0.04); border-left-color: var(--green); }
+        .sidebar a:hover { color: var(--green); background: rgba(26,140,0,0.06); border-left-color: var(--green); }
 
         .main { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
 
         .card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
         .card-label {
@@ -104,10 +106,10 @@
         }
 
         .btn-start {
-            width: 100%; padding: 18px; background: var(--green); color: #000; border: none;
+            width: 100%; padding: 18px; background: var(--green); color: #ffffff; border: none;
             border-radius: 10px; font-size: 1em; font-weight: bold; font-family: inherit;
             letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-            transition: transform 0.1s; box-shadow: 0 0 20px rgba(57,255,20,0.25);
+            transition: transform 0.1s; box-shadow: 0 4px 14px rgba(26,140,0,0.3);
         }
         .btn-start:active { transform: scale(0.98); }
         .btn-start:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -124,6 +126,7 @@
         .stat-card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 16px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         .stat-value { font-size: 1.5em; font-weight: bold; color: var(--green); line-height: 1; margin-bottom: 6px; }
         .stat-label { font-size: 0.62em; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
@@ -132,26 +135,14 @@
         .graph-card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
-        .graph-row {
-            display: flex; flex-direction: column; gap: 12px;
-        }
-
+        .graph-row { display: flex; flex-direction: column; gap: 12px; }
         .graph-item { display: flex; flex-direction: column; gap: 5px; }
-
-        .graph-label-row {
-            display: flex; justify-content: space-between;
-            align-items: center;
-        }
-
-        .graph-var-name {
-            font-size: 0.72em; font-weight: bold; color: var(--green); letter-spacing: 2px;
-        }
-
-        .graph-score-val {
-            font-size: 0.72em; color: var(--text); letter-spacing: 1px;
-        }
+        .graph-label-row { display: flex; justify-content: space-between; align-items: center; }
+        .graph-var-name { font-size: 0.72em; font-weight: bold; color: var(--green); letter-spacing: 2px; }
+        .graph-score-val { font-size: 0.72em; color: var(--text); letter-spacing: 1px; }
 
         .graph-bar-bg {
             width: 100%; height: 10px; background: var(--border);
@@ -159,37 +150,35 @@
         }
 
         .graph-bar-fill {
-            height: 100%; border-radius: 5px;
-            transition: width 0.8s ease;
-            background: var(--green);
+            height: 100%; border-radius: 5px; transition: width 0.8s ease;
         }
-
-        .graph-bar-fill.low  { background: var(--danger); }
-        .graph-bar-fill.mid  { background: var(--amber, #ffaa00); }
+        .graph-bar-fill.low  { background: #cc0000; }
+        .graph-bar-fill.mid  { background: #e08800; }
         .graph-bar-fill.high { background: var(--green); }
 
         .graph-threshold-note {
             font-size: 0.6em; color: var(--muted); text-align: right;
-            margin-top: 2px; letter-spacing: 1px;
+            margin-top: 6px; letter-spacing: 1px;
         }
 
         /* ── Modals ── */
         .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             z-index: 300; align-items: center; justify-content: center; padding: 20px;
         }
         .modal-overlay.active { display: flex; }
 
         .modal {
-            background: var(--surface); border: 1px solid var(--green); border-radius: var(--radius);
+            background: var(--surface); border: 2px solid var(--green); border-radius: var(--radius);
             padding: 24px; width: 100%; max-width: 400px; max-height: 82vh; overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
         }
 
         .modal-header {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
         }
 
-        .modal-title { font-size: 0.8em; letter-spacing: 3px; color: var(--green); text-transform: uppercase; }
+        .modal-title { font-size: 0.8em; letter-spacing: 3px; color: var(--green); text-transform: uppercase; font-weight: bold; }
 
         .modal-close {
             color: var(--green); cursor: pointer; font-size: 1em; font-weight: bold;
@@ -198,7 +187,7 @@
         }
 
         .ud-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.8em; margin-bottom: 16px; }
-        .ud-key { color: var(--green); letter-spacing: 1px; white-space: nowrap; }
+        .ud-key { color: var(--green); letter-spacing: 1px; white-space: nowrap; font-weight: bold; }
         .ud-val { color: var(--text); }
         .modal-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 
@@ -209,32 +198,23 @@
         }
         .rec-card:last-child { margin-bottom: 0; }
 
-        .rec-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
-
+        .rec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .rec-var-name { font-size: 0.85em; font-weight: bold; color: var(--green); letter-spacing: 2px; }
 
-        .rec-badge {
-            font-size: 0.68em; padding: 3px 8px; border-radius: 4px;
-            font-weight: bold; letter-spacing: 1px;
-        }
-        .rec-badge.pass { background: rgba(57,255,20,0.15); color: var(--green); border: 1px solid var(--green-dim); }
-        .rec-badge.fail { background: rgba(255,68,68,0.15); color: var(--danger); border: 1px solid #882222; }
+        .rec-badge { font-size: 0.68em; padding: 3px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 1px; }
+        .rec-badge.pass { background: rgba(26,140,0,0.12); color: var(--green); border: 1px solid var(--green-dim); }
+        .rec-badge.fail { background: rgba(204,0,0,0.10); color: var(--danger); border: 1px solid #cc0000; }
 
-        .rec-score-row {
-            display: flex; justify-content: space-between;
-            font-size: 0.72em; color: var(--muted); margin-bottom: 10px;
-        }
+        .rec-score-row { display: flex; justify-content: space-between; font-size: 0.72em; color: var(--muted); margin-bottom: 10px; }
 
         .rec-text {
             font-size: 0.78em; color: var(--text); line-height: 1.7;
             padding: 10px; background: var(--surface); border-radius: 6px;
             border-left: 3px solid var(--green);
+            border: 1px solid var(--border); border-left: 3px solid var(--green);
         }
-
         .rec-text.warning { border-left-color: var(--danger); }
-        .rec-text.caution { border-left-color: #ffaa00; }
+        .rec-text.caution { border-left-color: #e08800; }
 
         .muted-text { font-size: 0.78em; color: var(--muted); text-align: center; padding: 20px 0; }
 
@@ -243,8 +223,8 @@
             font-size: 0.78em; color: var(--text); line-height: 1.9;
             margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
         }
-        .vpass { color: var(--green); }
-        .vfail { color: var(--danger); }
+        .vpass { color: var(--green); font-weight: bold; }
+        .vfail { color: var(--danger); font-weight: bold; }
 
         .variation-box {
             border: 1px solid var(--border); border-radius: 10px;
@@ -255,11 +235,11 @@
         .variation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .variation-name { font-size: 0.85em; font-weight: bold; color: var(--green); letter-spacing: 2px; }
         .variation-badge { font-size: 0.7em; padding: 3px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 1px; }
-        .badge-pass { background: rgba(57,255,20,0.15); color: var(--green); border: 1px solid var(--green-dim); }
-        .badge-fail { background: rgba(255,68,68,0.15); color: var(--danger); border: 1px solid #882222; }
+        .badge-pass { background: rgba(26,140,0,0.12); color: var(--green); border: 1px solid var(--green-dim); }
+        .badge-fail { background: rgba(204,0,0,0.10); color: var(--danger); border: 1px solid #cc0000; }
 
         .variation-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .vstat { text-align: center; background: var(--surface); border-radius: 6px; padding: 8px 4px; }
+        .vstat { text-align: center; background: var(--surface); border-radius: 6px; padding: 8px 4px; border: 1px solid var(--border); }
         .vstat-val { font-size: 1em; font-weight: bold; color: var(--text); }
         .vstat-key { font-size: 0.58em; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
 
@@ -320,7 +300,6 @@
         <div class="bridge-status" id="bridgeStatus">BRIDGE_STATUS: STANDBY</div>
     </div>
 
-    <!-- Score Graph Card -->
     <div class="graph-card" id="graphCard" style="display:none;">
         <div class="card-label">📈 Avg Score per Variation</div>
         <div class="graph-row" id="graphRow"></div>
@@ -331,7 +310,6 @@
 
 <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
 
-    <!-- User Details Modal -->
     <div class="modal" id="userDetailsModal" style="display:none;">
         <div class="modal-header">
             <div class="modal-title">User Details</div>
@@ -352,7 +330,6 @@
         </div>
     </div>
 
-    <!-- Variation Progress Modal -->
     <div class="modal" id="variationModal" style="display:none;">
         <div class="modal-header">
             <div class="modal-title">Variation Progress</div>
@@ -361,7 +338,6 @@
         <div id="vpContent" class="muted-text">Loading...</div>
     </div>
 
-    <!-- Recommendation Progression Modal -->
     <div class="modal" id="recommendationModal" style="display:none;">
         <div class="modal-header">
             <div class="modal-title">🤖 Recommendation Progression</div>
@@ -370,7 +346,6 @@
         <div id="recContent" class="muted-text">Loading...</div>
     </div>
 
-    <!-- Overview Modal -->
     <div class="modal" id="overviewModal" style="display:none;">
         <div class="modal-header">
             <div class="modal-title">"Where Vision meets Strength"</div>
@@ -398,7 +373,6 @@
 <script>
     const API_BASE = "http://10.92.143.200:5000";
 
-    // ── Sidebar ──────────────────────────────────────────────────────
     function openSidebar() {
         document.getElementById("sidebar").classList.add("active");
         document.getElementById("sidebarOverlay").classList.add("active");
@@ -408,7 +382,6 @@
         document.getElementById("sidebarOverlay").classList.remove("active");
     }
 
-    // ── Modals ───────────────────────────────────────────────────────
     function openModal(id) {
         closeSidebar();
         closeAllModals();
@@ -430,7 +403,6 @@
     function showRecommendation()    { openModal("recommendationModal"); loadRecommendationModal(); }
     function showOverview()          { openModal("overviewModal"); }
 
-    // ── Auth ─────────────────────────────────────────────────────────
     function logout() {
         localStorage.removeItem("presscoach_user");
         localStorage.removeItem("presscoach_name");
@@ -442,16 +414,12 @@
         });
     }
 
-    // ── Workout trigger ──────────────────────────────────────────────
     async function triggerWorkout() {
         const email = localStorage.getItem("presscoach_user");
         const status = document.getElementById("bridgeStatus");
         if (!email) { alert("Please login first!"); return; }
-    
         status.innerText = "Waking up laptop camera...";
-    
         try {
-            // Use the API_URL constant instead of 127.0.0.1
             const res = await fetch(`${API_URL}/start_workout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -463,8 +431,7 @@
             status.innerText = "Laptop Offline. Is window_response.py running?";
         }
     }
-        
-    // ── Firebase helpers ─────────────────────────────────────────────
+
     async function getLastSession(email) {
         let snap;
         try {
@@ -490,7 +457,6 @@
         return list;
     }
 
-    // ── Quick stats ──────────────────────────────────────────────────
     async function loadQuickStats() {
         const user = await waitForUser();
         if (!user) return;
@@ -506,27 +472,20 @@
                 dateEl.innerText = session.end_time.split(" ")[0] || "--";
                 dateEl.style.fontSize = "0.75em";
             }
-
-            // Render score graph
             renderScoreGraph(getVariationList(session));
         } catch (e) { console.error("loadQuickStats:", e); }
     }
 
-    // ── Score Graph ──────────────────────────────────────────────────
     function renderScoreGraph(varList) {
         if (!varList || varList.length === 0) return;
-
         const card = document.getElementById("graphCard");
         const row  = document.getElementById("graphRow");
         card.style.display = "block";
-
         row.innerHTML = varList.map(v => {
             const score = typeof v.avg_score === "number" ? v.avg_score : 0;
             const pct   = Math.round(score * 100);
-            // Color based on score
             const fillClass = score < 0.70 ? "low" : score < 0.85 ? "mid" : "high";
             const scoreLabel = score > 0 ? score.toFixed(2) : "--";
-
             return `
                 <div class="graph-item">
                     <div class="graph-label-row">
@@ -534,13 +493,10 @@
                         <span class="graph-score-val">${scoreLabel}</span>
                     </div>
                     <div class="graph-bar-bg">
-                        <div class="graph-bar-fill ${fillClass}" style="width: 0%"
-                             data-target="${pct}%"></div>
+                        <div class="graph-bar-fill ${fillClass}" style="width: 0%" data-target="${pct}%"></div>
                     </div>
                 </div>`;
         }).join("");
-
-        // Animate bars after render
         setTimeout(() => {
             row.querySelectorAll(".graph-bar-fill").forEach(bar => {
                 bar.style.width = bar.dataset.target;
@@ -548,117 +504,56 @@
         }, 100);
     }
 
-    // ── Rule-based Recommendation ────────────────────────────────────
     function generateRecommendation(v) {
-        const total      = v.reps_completed || 1;
-        const score      = v.avg_score ?? 0;
-        const h          = v.height_feedback  || {};
-        const w          = v.width_feedback   || {};
-        const sets       = v.set_summaries    || [];
-
-        const lowPct   = Math.round(((h.LOW    || 0) / total) * 100);
-        const closePct = Math.round(((w.CLOSE  || 0) / total) * 100);
-        const widePct  = Math.round(((w.WIDE   || 0) / total) * 100);
-
-        // Fatigue — score drop between first and last set
+        const total    = v.reps_completed || 1;
+        const score    = v.avg_score ?? 0;
+        const h        = v.height_feedback || {};
+        const w        = v.width_feedback  || {};
+        const sets     = v.set_summaries   || [];
+        const lowPct   = Math.round(((h.LOW   || 0) / total) * 100);
+        const closePct = Math.round(((w.CLOSE || 0) / total) * 100);
+        const widePct  = Math.round(((w.WIDE  || 0) / total) * 100);
         let fatigueDrop = 0;
         if (sets.length >= 2) {
             fatigueDrop = Math.round((sets[0].score - sets[sets.length - 1].score) * 100);
         }
-
-        // Priority order — worst issue gets flagged first
-        if (lowPct >= 30) {
-            return {
-                text: `Bench angle too low on ${lowPct}% of reps. Ensure the bench is properly set to the correct angle before locking in your position.`,
-                level: "warning"
-            };
-        }
-        if (closePct >= 20) {
-            return {
-                text: `Arms too close on ${closePct}% of reps. Widen your grip to shoulder-width distance for better chest engagement.`,
-                level: "warning"
-            };
-        }
-        if (widePct >= 20) {
-            return {
-                text: `Arms too wide on ${widePct}% of reps. Bring elbows slightly inward — avoid the Y-shape flare to protect your shoulders.`,
-                level: "warning"
-            };
-        }
-        if (fatigueDrop >= 10) {
-            return {
-                text: `Score dropped ${fatigueDrop}% from Set 1 to Set 2 — signs of fatigue. Try resting longer between sets or slightly reduce weight.`,
-                level: "caution"
-            };
-        }
-        if (score < 0.70) {
-            return {
-                text: `Score ${score.toFixed(2)} is below the passing threshold. Focus on full arm extension and keeping both arms moving in sync.`,
-                level: "warning"
-            };
-        }
-        if (score < 0.85) {
-            return {
-                text: `Good score at ${score.toFixed(2)}. Maintain consistent form and aim for full extension on every rep to push above 0.85.`,
-                level: "caution"
-            };
-        }
-        if (score < 0.95) {
-            return {
-                text: `Strong performance at ${score.toFixed(2)}. Keep your tempo controlled and both arms in sync — you're approaching mastery.`,
-                level: ""
-            };
-        }
-        return {
-            text: `Excellent form at ${score.toFixed(2)}. You're ready to progress — consider increasing reps, sets, or weight on this variation.`,
-            level: ""
-        };
+        if (lowPct >= 30)   return { text: `Bench angle too low on ${lowPct}% of reps. Ensure the bench is properly set to the correct angle before locking in your position.`, level: "warning" };
+        if (closePct >= 20) return { text: `Arms too close on ${closePct}% of reps. Widen your grip to shoulder-width distance for better chest engagement.`, level: "warning" };
+        if (widePct >= 20)  return { text: `Arms too wide on ${widePct}% of reps. Bring elbows slightly inward — avoid the Y-shape flare to protect your shoulders.`, level: "warning" };
+        if (fatigueDrop >= 10) return { text: `Score dropped ${fatigueDrop}% from Set 1 to Set 2 — signs of fatigue. Try resting longer between sets or slightly reduce weight.`, level: "caution" };
+        if (score < 0.70)  return { text: `Score ${score.toFixed(2)} is below the passing threshold. Focus on full arm extension and keeping both arms moving in sync.`, level: "warning" };
+        if (score < 0.85)  return { text: `Good score at ${score.toFixed(2)}. Maintain consistent form and aim for full extension on every rep to push above 0.85.`, level: "caution" };
+        if (score < 0.95)  return { text: `Strong performance at ${score.toFixed(2)}. Keep your tempo controlled and both arms in sync — you're approaching mastery.`, level: "" };
+        return { text: `Excellent form at ${score.toFixed(2)}. You're ready to progress — consider increasing reps, sets, or weight on this variation.`, level: "" };
     }
 
-    // ── Recommendation Modal ─────────────────────────────────────────
     async function loadRecommendationModal() {
         const el = document.getElementById("recContent");
         el.innerHTML = "<div class='muted-text'>Loading...</div>";
-
         const user = await waitForUser();
         if (!user) { el.innerHTML = "<div class='muted-text'>Not logged in.</div>"; return; }
-
         try {
             const session = await getLastSession(user.email);
-            if (!session) {
-                el.innerHTML = "<div class='muted-text'>Complete a session first to get recommendations.</div>";
-                return;
-            }
-
+            if (!session) { el.innerHTML = "<div class='muted-text'>Complete a session first to get recommendations.</div>"; return; }
             const varList = getVariationList(session);
-            if (varList.length === 0) {
-                el.innerHTML = "<div class='muted-text'>No variation data found.</div>";
-                return;
-            }
-
-            // Session summary line
+            if (varList.length === 0) { el.innerHTML = "<div class='muted-text'>No variation data found.</div>"; return; }
             const overallLabel = session.passed
-                ? `<span style="color:var(--green)">PASSED ✅</span>`
-                : `<span style="color:var(--danger)">FAILED ❌</span>`;
-
+                ? `<span style="color:var(--green);font-weight:bold;">PASSED ✅</span>`
+                : `<span style="color:var(--danger);font-weight:bold;">FAILED ❌</span>`;
             const summaryHtml = `
                 <div style="font-size:0.75em; color:var(--muted); margin-bottom:16px; line-height:1.8;">
                     Last session: ${overallLabel} &nbsp;·&nbsp;
-                    Weight: <span style="color:var(--green)">${session.weight ?? "--"} lbs</span> &nbsp;·&nbsp;
+                    Weight: <span style="color:var(--green);font-weight:bold;">${session.weight ?? "--"} lbs</span> &nbsp;·&nbsp;
                     ${session.end_time ?? "--"}
                 </div>`;
-
             const cardsHtml = varList.map(v => {
-                const rec        = generateRecommendation(v);
-                const badgeClass = v.passed ? "pass" : "fail";
-                const badgeText  = v.passed ? "PASS" : "FAIL";
-                const avgScore   = typeof v.avg_score === "number" ? v.avg_score.toFixed(2) : "--";
-
+                const rec      = generateRecommendation(v);
+                const avgScore = typeof v.avg_score === "number" ? v.avg_score.toFixed(2) : "--";
                 return `
                     <div class="rec-card">
                         <div class="rec-header">
                             <div class="rec-var-name">${v.name}</div>
-                            <div class="rec-badge ${badgeClass}">${badgeText}</div>
+                            <div class="rec-badge ${v.passed ? "pass" : "fail"}">${v.passed ? "PASS" : "FAIL"}</div>
                         </div>
                         <div class="rec-score-row">
                             <span>AVG SCORE: <strong style="color:var(--text)">${avgScore}</strong></span>
@@ -667,25 +562,17 @@
                         <div class="rec-text ${rec.level}">${rec.text}</div>
                     </div>`;
             }).join("");
-
             el.innerHTML = summaryHtml + cardsHtml;
-
         } catch (err) {
-            console.error(err);
             el.innerHTML = "<div class='muted-text'>Failed to load recommendations.</div>";
         }
     }
 
-    // ── Variation Progress Modal ─────────────────────────────────────
     function buildVariationHTML(session) {
         if (!session) return "<div class='muted-text'>No session data yet.</div>";
         const list = getVariationList(session);
         if (list.length === 0) return "<div class='muted-text'>No variation data yet.</div>";
-
-        const overall = session.passed
-            ? '<span class="vpass">PASSED ✅</span>'
-            : '<span class="vfail">FAILED ❌</span>';
-
+        const overall = session.passed ? '<span class="vpass">PASSED ✅</span>' : '<span class="vfail">FAILED ❌</span>';
         const summary = `
             <div class="summary-block">
                 <div>OVERALL: ${overall}</div>
@@ -694,7 +581,6 @@
                      &nbsp;·&nbsp; SETS: ${session.max_sets ?? "--"}</div>
                 <div style="color:var(--muted);font-size:0.9em;">END: ${session.end_time ?? "--"}</div>
             </div>`;
-
         const boxes = list.map(v => {
             const w = v.width_feedback || {};
             const h = v.height_feedback || {};
@@ -702,8 +588,7 @@
             const avgScore = typeof v.avg_score === "number" ? v.avg_score.toFixed(2) : "--";
             const setsHtml = sets.length > 0
                 ? sets.map(s => `<div class="set-line">› Set ${s.set}: ${s.reps ?? "--"} reps — ${typeof s.score === "number" ? s.score.toFixed(2) : "--"}</div>`).join("")
-                : `<div class="set-line" style="color:var(--muted)">No set data.</div>`;
-
+                : `<div class="set-line">No set data.</div>`;
             return `
                 <div class="variation-box">
                     <div class="variation-header">
@@ -728,7 +613,6 @@
                     </div>
                 </div>`;
         }).join("");
-
         return summary + boxes;
     }
 
@@ -739,13 +623,12 @@
         if (!user) { el.innerHTML = "<div class='muted-text'>Not logged in.</div>"; return; }
         try {
             const session = await getLastSession(user.email);
-            el.innerHTML  = buildVariationHTML(session);
+            el.innerHTML = buildVariationHTML(session);
         } catch (err) {
             el.innerHTML = "<div class='muted-text'>Failed to load data.</div>";
         }
     }
 
-    // ── User Details Modal ───────────────────────────────────────────
     async function populateUserDetailsModal() {
         const set = (id, val) => {
             const el = document.getElementById(id);
@@ -753,11 +636,9 @@
         };
         ["udFirst","udLast","udEmail","udCreated","udHeight","udWeight","udLastDate","udLastStatus"]
             .forEach(id => set(id, "..."));
-
         const user = await waitForUser();
         if (!user) { set("udLastStatus","Not logged in"); return; }
         set("udEmail", user.email);
-
         try {
             const doc     = await db.collection("users").doc(user.email).get();
             const profile = doc.exists ? doc.data() : {};
@@ -779,7 +660,6 @@
         }
     }
 
-    // ── Init ─────────────────────────────────────────────────────────
     window.onload = () => {
         const email     = localStorage.getItem("presscoach_user");
         const firstName = localStorage.getItem("presscoach_name");
