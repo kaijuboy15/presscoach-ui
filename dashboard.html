@@ -460,7 +460,7 @@
         if (!email) { alert("Please login first!"); return; }
         status.innerText = "Waking up laptop camera...";
         try {
-            const res = await fetch(`${API_URL}/start_workout`, {
+            const res = await fetch(`${API_BASE}/start_workout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
