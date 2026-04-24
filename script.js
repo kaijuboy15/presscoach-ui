@@ -102,7 +102,7 @@ async function forgotPassword() {
     }
 }
 
-const LAPTOP_IP = '172.20.10.8'; 
+const LAPTOP_IP = '10.177.33.189'; 
 const API_URL = `http://${LAPTOP_IP}:5000`;
 //const API_URL = "http://10.92.143.200:5000";
 
