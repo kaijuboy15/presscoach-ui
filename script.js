@@ -102,7 +102,7 @@ async function forgotPassword() {
     }
 }
 
-const LAPTOP_IP = '10.177.33.189'; 
+const LAPTOP_IP = '10.25.54.189'; 
 const API_URL = `http://${LAPTOP_IP}:5000`;
 //const API_URL = "http://10.92.143.200:5000";
 // --- HYBRID LOGIN (No Python Needed) ---
