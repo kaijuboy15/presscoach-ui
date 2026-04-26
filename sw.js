@@ -1,4 +1,4 @@
-const CACHE_NAME = "presscoach-v12";
+const CACHE_NAME = "presscoach-v13";
 
 // Use relative paths — works regardless of subdirectory
 const STATIC_ASSETS = [
